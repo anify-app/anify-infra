@@ -66,7 +66,7 @@ type Event = {
   rating: string | undefined;
   episodes: number | undefined;
   mainImage: string | undefined;
-  premieredSeason: string | undefined;
+  season: string | undefined;
   airedStart: string | undefined;
   airedEnd: string | undefined;
   duration: string | undefined;
@@ -97,7 +97,7 @@ class AnimeEntity extends Document implements Omit<Event, "id"> {
   rating: string | undefined;
   episodes: number | undefined;
   mainImage: string | undefined;
-  premieredSeason: string | undefined;
+  season: string | undefined;
   airedStart: string | undefined;
   airedEnd: string | undefined;
   duration: string | undefined;
@@ -123,7 +123,7 @@ export const handler = async (event: Event) => {
     rating,
     status,
     genres,
-    premieredSeason,
+    season,
     airedStart,
     airedEnd,
     duration,
@@ -147,7 +147,7 @@ export const handler = async (event: Event) => {
     PK: { id, entity: "ANIME" },
     SK: { id: "v1", entity: "VERSION" },
     GSI1PK: { id: airedStart, entity: "AIREDSTART" },
-    GSI1SK: { id: premieredSeason, entity: "PREMIEREDSEASON" },
+    GSI1SK: { id: season, entity: "SEASON" },
     GSI2PK: { id: status, entity: "STATUS" },
     title,
     episodes,
@@ -155,7 +155,7 @@ export const handler = async (event: Event) => {
     status,
     genres,
     rating,
-    premieredSeason,
+    season,
     airedStart,
     airedEnd,
     duration,

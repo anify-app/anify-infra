@@ -17,7 +17,7 @@ export class PouroverInfraStack extends cdk.Stack {
     });
 
     // dynamodb table Single Table Design
-    const table = new Table(this, "CMS", {
+    const table = new Table(this, "AnimeDB", {
       tableName: "anime",
       partitionKey: {
         name: "PK",
@@ -30,15 +30,15 @@ export class PouroverInfraStack extends cdk.Stack {
       billingMode: BillingMode.PAY_PER_REQUEST,
     });
     table.addGlobalSecondaryIndex({
-      indexName: "GSI",
-      sortKey: { name: "SK", type: AttributeType.STRING },
-      partitionKey: { name: "GSI", type: AttributeType.STRING },
+      indexName: "GSI1",
+      sortKey: { name: "GSI1SK", type: AttributeType.STRING },
+      partitionKey: { name: "GSI1PK", type: AttributeType.STRING },
     });
 
     table.addGlobalSecondaryIndex({
       indexName: "GSI2",
-      sortKey: { name: "SK", type: AttributeType.STRING },
-      partitionKey: { name: "GSI2", type: AttributeType.STRING },
+      sortKey: { name: "GSI2SK", type: AttributeType.STRING },
+      partitionKey: { name: "GSI2PK", type: AttributeType.STRING },
     });
 
     // grant lambda full operational access to table

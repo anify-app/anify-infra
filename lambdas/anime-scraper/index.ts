@@ -18,16 +18,38 @@ const schema = new dynamoose.Schema(
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
       // "get": (val) =>  // split the string on # and return an object
     },
-    title: String,
-    episodes: Number,
-    mainImage: String,
-    rating: String,
-    status: String,
-    genres: {
-      type: Array,
-      schema: [String],
+    //@ts-expect-error we allow val to have AnimeTableAttributes
+    GS1PK: {
+      type: Object,
+      index: {
+        name: "GSI1",
+        rangeKey: "GSI1SK",
+      },
+      set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
+      // "get": (val) =>  // split the string on # and return an object
     },
-    // ... Add more attributes here
+    //@ts-expect-error we allow val to have AnimeTableAttributes
+    GSI1SK: {
+      type: Object,
+      set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
+      // "get": (val) =>  // split the string on # and return an object
+    },
+    //@ts-expect-error we allow val to have AnimeTableAttributes
+    GS2PK: {
+      type: Object,
+      index: {
+        name: "GSI2",
+        rangeKey: "GSI2SK",
+      },
+      set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
+      // "get": (val) =>  // split the string on # and return an object
+    },
+    //@ts-expect-error we allow val to have AnimeTableAttributes
+    GS21SK: {
+      type: Object,
+      set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
+      // "get": (val) =>  // split the string on # and return an object
+    },
   },
   {
     saveUnknown: true, // use attributes which aren't defined in the schema
@@ -44,22 +66,76 @@ type Event = {
   rating: string | undefined;
   episodes: number | undefined;
   mainImage: string | undefined;
+  premieredSeason: string | undefined;
+  airedStart: string | undefined;
+  airedEnd: string | undefined;
+  duration: string | undefined;
+  sourceMaterialType: string;
+  producers: Array<string>;
+  licensors: Array<string>;
+  studios: Array<string>;
+  sources: Array<{
+    name: string;
+    url: string;
+  }>;
+  englishTitle: string | undefined;
+  japaneseTitle: string | undefined;
+  synonyms: Array<string>;
 };
 class AnimeEntity extends Document implements Omit<Event, "id"> {
   PK: AnimeTableAttributes;
   SK: AnimeTableAttributes;
+  GSI1PK: AnimeTableAttributes;
+  GSI1SK: AnimeTableAttributes;
+  GS12PK: AnimeTableAttributes;
+  GSI2SK: AnimeTableAttributes;
   title: string;
   type: string;
   genres: Array<string>;
   status: string;
+  sourceMaterialType: string;
   rating: string | undefined;
   episodes: number | undefined;
   mainImage: string | undefined;
+  premieredSeason: string | undefined;
+  airedStart: string | undefined;
+  airedEnd: string | undefined;
+  duration: string | undefined;
+  producers: Array<string>;
+  licensors: Array<string>;
+  studios: Array<string>;
+  sources: Array<{
+    name: string;
+    url: string;
+  }>;
+  englishTitle: string | undefined;
+  japaneseTitle: string | undefined;
+  synonyms: Array<string>;
 }
 
 export const handler = async (event: Event) => {
   // extract attributes from event
-  const { title, id, mainImage, episodes, rating, status, genres } = event;
+  const {
+    title,
+    id,
+    mainImage,
+    episodes,
+    rating,
+    status,
+    genres,
+    premieredSeason,
+    airedStart,
+    airedEnd,
+    duration,
+    producers,
+    sourceMaterialType,
+    licensors,
+    studios,
+    sources,
+    englishTitle,
+    japaneseTitle,
+    synonyms,
+  } = event;
 
   // create domain model
   const AnimeEntity = dynamoose.model<AnimeEntity>("anime", schema, {
@@ -70,12 +146,27 @@ export const handler = async (event: Event) => {
   const anime = new AnimeEntity({
     PK: { id, entity: "ANIME" },
     SK: { id: "v1", entity: "VERSION" },
+    GSI1PK: { id: airedStart, entity: "AIREDSTART" },
+    GSI1SK: { id: premieredSeason, entity: "PREMIEREDSEASON" },
+    GSI2PK: { id: status, entity: "STATUS" },
     title,
     episodes,
     mainImage,
     status,
     genres,
     rating,
+    premieredSeason,
+    airedStart,
+    airedEnd,
+    duration,
+    producers,
+    licensors,
+    studios,
+    sourceMaterialType,
+    sources,
+    englishTitle,
+    japaneseTitle,
+    synonyms,
   });
 
   // save model to dynamo

@@ -1,6 +1,7 @@
 import * as dynamoose from "dynamoose";
 import { Document } from "dynamoose/dist/Document";
 
+type AnimeTableAttributes = { id: string; entity: string };
 const schema = new dynamoose.Schema(
   {
     //@ts-expect-error we allow val to have AnimeTableAttributes
@@ -18,6 +19,8 @@ const schema = new dynamoose.Schema(
       // "get": (val) =>  // split the string on # and return an object
     },
     title: String,
+    episodes: Number,
+    mainImage: String,
     // ... Add more attributes here
   },
   {
@@ -26,26 +29,38 @@ const schema = new dynamoose.Schema(
   }
 );
 
-type AnimeTableAttributes = { id: string; entity: string };
-class AnimeEntity extends Document {
+type Event = {
+  title: string;
+  id: string;
+  type: string | undefined;
+  episodes: number | undefined;
+  mainImage: string | undefined;
+};
+class AnimeEntity extends Document implements Omit<Event, "id"> {
   PK: AnimeTableAttributes;
   SK: AnimeTableAttributes;
   title: string;
+  type: string;
+  episodes: number | undefined;
+  mainImage: string | undefined;
 }
-export const handler = async (event: { title: string; id: string }) => {
+
+export const handler = async (event: Event) => {
+  // extract attributes from event
+  const { title, id, mainImage, episodes } = event;
+
   // create domain model
   const AnimeEntity = dynamoose.model<AnimeEntity>("anime", schema, {
     create: false,
   });
-
-  // extract attributes from event
-  const { title, id } = event;
 
   // create instance of the model
   const anime = new AnimeEntity({
     PK: { id, entity: "ANIME" },
     SK: { id: "v1", entity: "VERSION" },
     title,
+    episodes,
+    mainImage,
   });
 
   // save model to dynamo

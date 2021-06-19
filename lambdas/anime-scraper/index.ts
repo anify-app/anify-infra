@@ -21,6 +21,12 @@ const schema = new dynamoose.Schema(
     title: String,
     episodes: Number,
     mainImage: String,
+    rating: String,
+    status: String,
+    genres: {
+      type: Array,
+      schema: [String],
+    },
     // ... Add more attributes here
   },
   {
@@ -30,9 +36,12 @@ const schema = new dynamoose.Schema(
 );
 
 type Event = {
-  title: string;
   id: string;
-  type: string | undefined;
+  title: string;
+  genres: Array<string>;
+  type: string;
+  status: string;
+  rating: string | undefined;
   episodes: number | undefined;
   mainImage: string | undefined;
 };
@@ -41,13 +50,16 @@ class AnimeEntity extends Document implements Omit<Event, "id"> {
   SK: AnimeTableAttributes;
   title: string;
   type: string;
+  genres: Array<string>;
+  status: string;
+  rating: string | undefined;
   episodes: number | undefined;
   mainImage: string | undefined;
 }
 
 export const handler = async (event: Event) => {
   // extract attributes from event
-  const { title, id, mainImage, episodes } = event;
+  const { title, id, mainImage, episodes, rating, status, genres } = event;
 
   // create domain model
   const AnimeEntity = dynamoose.model<AnimeEntity>("anime", schema, {
@@ -61,6 +73,9 @@ export const handler = async (event: Event) => {
     title,
     episodes,
     mainImage,
+    status,
+    genres,
+    rating,
   });
 
   // save model to dynamo

@@ -19,7 +19,7 @@ const schema = new dynamoose.Schema(
       // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
-    GS1PK: {
+    GSI1PK: {
       type: Object,
       index: {
         name: "GSI1",
@@ -35,7 +35,7 @@ const schema = new dynamoose.Schema(
       // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
-    GS2PK: {
+    GSI2PK: {
       type: Object,
       index: {
         name: "GSI2",
@@ -45,7 +45,7 @@ const schema = new dynamoose.Schema(
       // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
-    GS21SK: {
+    GSI2SK: {
       type: Object,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
       // "get": (val) =>  // split the string on # and return an object
@@ -87,7 +87,7 @@ class AnimeEntity extends Document implements Omit<Event, "id"> {
   SK: AnimeTableAttributes;
   GSI1PK: AnimeTableAttributes;
   GSI1SK: AnimeTableAttributes;
-  GS12PK: AnimeTableAttributes;
+  GSI2PK: AnimeTableAttributes;
   GSI2SK: AnimeTableAttributes;
   title: string;
   type: string;

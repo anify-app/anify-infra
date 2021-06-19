@@ -42,6 +42,6 @@ export class PouroverInfraStack extends cdk.Stack {
     });
 
     // grant lambda full operational access to table
-    table.grantReadWriteData(animeScraper);
+    table.grantFullAccess(animeScraper);
   }
 }

@@ -65,6 +65,7 @@ type Event = {
   airedEnd: string | undefined;
   duration: string | undefined;
   sourceMaterialType: string;
+  description: string | undefined;
   producers: Array<string>;
   licensors: Array<string>;
   studios: Array<string>;
@@ -92,6 +93,7 @@ class AnimeEntity extends Document implements Event {
   rating: string | undefined;
   episodes: number | undefined;
   mainImage: string | undefined;
+  description: string | undefined;
   season: string | undefined;
   airedStart: string | undefined;
   airedEnd: string | undefined;

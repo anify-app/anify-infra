@@ -7,19 +7,19 @@ const schema = new dynamoose.Schema(
   {
     //@ts-expect-error we allow val to have AnimeTableAttributes
     PK: {
-      type: String,
+      type: Object,
       hashKey: true,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     SK: {
-      type: String,
+      type: Object,
       rangeKey: true,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI1PK: {
-      type: String,
+      type: Object,
       index: {
         name: "GSI1",
         rangeKey: "GSI1SK",
@@ -28,12 +28,12 @@ const schema = new dynamoose.Schema(
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI1SK: {
-      type: String,
+      type: Object,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI2PK: {
-      type: String,
+      type: Object,
       index: {
         name: "GSI2",
         rangeKey: "GSI2SK",
@@ -42,7 +42,7 @@ const schema = new dynamoose.Schema(
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI2SK: {
-      type: String,
+      type: Object,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
     },
   },
@@ -53,7 +53,6 @@ const schema = new dynamoose.Schema(
 );
 
 type Event = {
-  id: string;
   title: string;
   genres: Array<string>;
   type: string;
@@ -77,7 +76,7 @@ type Event = {
   japaneseTitle: string | undefined;
   synonyms: Array<string>;
 };
-class AnimeEntity extends Document implements Omit<Event, "id"> {
+class AnimeEntity extends Document implements Event {
   PK: AnimeTableAttributes;
   SK: AnimeTableAttributes;
   GSI1PK: AnimeTableAttributes;

@@ -1,54 +1,49 @@
 import * as dynamoose from "dynamoose";
 import { Document } from "dynamoose/dist/Document";
+import slugify from "slugify";
 
 type AnimeTableAttributes = { id: string; entity: string };
 const schema = new dynamoose.Schema(
   {
     //@ts-expect-error we allow val to have AnimeTableAttributes
     PK: {
-      type: Object,
+      type: String,
       hashKey: true,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-      // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     SK: {
-      type: Object,
+      type: String,
       rangeKey: true,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-      // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI1PK: {
-      type: Object,
+      type: String,
       index: {
         name: "GSI1",
         rangeKey: "GSI1SK",
       },
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-      // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI1SK: {
-      type: Object,
+      type: String,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-      // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI2PK: {
-      type: Object,
+      type: String,
       index: {
         name: "GSI2",
         rangeKey: "GSI2SK",
       },
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-      // "get": (val) =>  // split the string on # and return an object
     },
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI2SK: {
-      type: Object,
+      type: String,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-      // "get": (val) =>  // split the string on # and return an object
     },
   },
   {
@@ -90,6 +85,7 @@ class AnimeEntity extends Document implements Omit<Event, "id"> {
   GSI2PK: AnimeTableAttributes;
   GSI2SK: AnimeTableAttributes;
   title: string;
+  slug: string;
   type: string;
   genres: Array<string>;
   status: string;
@@ -115,58 +111,22 @@ class AnimeEntity extends Document implements Omit<Event, "id"> {
 
 export const handler = async (event: Event) => {
   // extract attributes from event
-  const {
-    title,
-    id,
-    mainImage,
-    episodes,
-    rating,
-    status,
-    genres,
-    season,
-    airedStart,
-    airedEnd,
-    duration,
-    producers,
-    sourceMaterialType,
-    licensors,
-    studios,
-    sources,
-    englishTitle,
-    japaneseTitle,
-    synonyms,
-  } = event;
+  const { title, status, season, airedStart } = event;
 
   // create domain model
   const AnimeEntity = dynamoose.model<AnimeEntity>("anime", schema, {
     create: false,
   });
-
+  const slug = slugify(title);
   // create instance of the model
   const anime = new AnimeEntity({
-    PK: { id, entity: "ANIME" },
+    PK: { id: slug, entity: "ANIME" },
     SK: { id: "v1", entity: "VERSION" },
     GSI1PK: { id: airedStart, entity: "AIREDSTART" },
     GSI1SK: { id: season, entity: "SEASON" },
     GSI2PK: { id: status, entity: "STATUS" },
-    title,
-    episodes,
-    mainImage,
-    status,
-    genres,
-    rating,
-    season,
-    airedStart,
-    airedEnd,
-    duration,
-    producers,
-    licensors,
-    studios,
-    sourceMaterialType,
-    sources,
-    englishTitle,
-    japaneseTitle,
-    synonyms,
+    slug,
+    ...event,
   });
 
   // save model to dynamo

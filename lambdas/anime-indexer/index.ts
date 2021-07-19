@@ -21,7 +21,7 @@ export const handler = async (event: DynamoDBStreamEvent) => {
     return unmarshall(record.dynamodb?.NewImage);
   }).filter(isPresent);
 
-  const indexedRecords = records.map((record) => ({
+  const indexedRecords = records.map(({ relations, ...record }) => ({
     objectID: record.PK,
     ...record,
   }));

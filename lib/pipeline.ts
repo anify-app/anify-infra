@@ -27,8 +27,8 @@ export class Pipeline extends Stack {
           jsonField: "github",
         }),
         branch: "main",
-        owner: "Pourover-Labs",
-        repo: "pourover-infra",
+        owner: "anify-app",
+        repo: "anify-infra",
       }),
 
       // How it will be built and synthesized

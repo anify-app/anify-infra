@@ -1,5 +1,5 @@
 {
-  "name": "pourover-infra",
+  "name": "anify-infra",
   "version": "0.1.0",
   "bin": {
     "pourover-infra": "bin/pourover-infra.js"

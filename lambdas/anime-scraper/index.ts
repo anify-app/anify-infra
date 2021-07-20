@@ -115,7 +115,7 @@ class AnimeEntity extends Document implements Event {
 }
 
 export const handler = async (event: Event) => {
-  if (event.title) {
+  if (!event.title) {
     console.log("no title, skipping");
     return;
   }

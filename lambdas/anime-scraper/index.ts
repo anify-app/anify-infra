@@ -1,5 +1,6 @@
 import * as dynamoose from "dynamoose";
 import { Document } from "dynamoose/dist/Document";
+import { getPlaiceholder, IGetPlaiceholderReturn } from "plaiceholder";
 import slugify from "slugify";
 
 type AnimeTableAttributes = { id: string; entity: string };
@@ -61,6 +62,7 @@ type Event = {
   episodes: number | undefined;
   mainImage: string | undefined;
   season: string | undefined;
+  score: string | undefined;
   airedStart: string | undefined;
   airedEnd: string | undefined;
   duration: string | undefined;
@@ -89,6 +91,8 @@ class AnimeEntity extends Document implements Event {
   type: string;
   genres: Array<string>;
   status: string;
+  blurredMainImage: string;
+  score: string | undefined;
   sourceMaterialType: string;
   rating: string | undefined;
   episodes: number | undefined;
@@ -112,13 +116,20 @@ class AnimeEntity extends Document implements Event {
 
 export const handler = async (event: Event) => {
   // extract attributes from event
-  const { title, status, season, airedStart } = event;
+  const { title, status, season, airedStart, mainImage } = event;
 
   // create domain model
   const AnimeEntity = dynamoose.model<AnimeEntity>("anime", schema, {
     create: false,
   });
+
+  //generate slug
   const slug = slugify(title);
+
+  let placiholder: IGetPlaiceholderReturn | undefined;
+  if (mainImage) {
+    placiholder = await getPlaiceholder(mainImage);
+  }
   // create instance of the model
   const anime = new AnimeEntity({
     PK: { id: slug, entity: "ANIME" },
@@ -127,6 +138,7 @@ export const handler = async (event: Event) => {
     GSI1SK: { id: season, entity: "SEASON" },
     GSI2PK: { id: status, entity: "STATUS" },
     slug,
+    mainImageBlurred: placiholder?.base64,
     ...event,
   });
 

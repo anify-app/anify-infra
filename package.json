@@ -37,6 +37,8 @@
     "dynamoose": "^2.7.3",
     "jikants": "^1.2.13",
     "lodash": "^4.17.21",
+    "plaiceholder": "^2.0.1",
+    "sharp": "^0.28.3",
     "slugify": "^1.5.3",
     "source-map-support": "^0.5.16"
   }

@@ -5,6 +5,12 @@ import {
   StreamViewType,
   Table,
 } from "@aws-cdk/aws-dynamodb";
+import * as tasks from "@aws-cdk/aws-stepfunctions-tasks";
+import {
+  Map,
+  StateMachine,
+  StateMachineType,
+} from "@aws-cdk/aws-stepfunctions";
 import { Duration, SecretValue } from "@aws-cdk/core";
 import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
 import { StartingPosition } from "@aws-cdk/aws-lambda";
@@ -21,6 +27,10 @@ export class PouroverInfraStack extends cdk.Stack {
       memorySize: 1024,
       timeout: Duration.seconds(30),
       functionName: "anime-scraper",
+      bundling: {
+        nodeModules: ["sharp"],
+        externalModules: ["sharp", "aws-sdk"],
+      },
     });
 
     // dynamodb table Single Table Design
@@ -71,9 +81,6 @@ export class PouroverInfraStack extends cdk.Stack {
 
     animeIndexer.addEventSource(
       new DynamoEventSource(animeTable, {
-        batchSize: 500,
-        tumblingWindow: cdk.Duration.seconds(30),
-        maxBatchingWindow: cdk.Duration.minutes(3),
         startingPosition: StartingPosition.TRIM_HORIZON,
       })
     );
@@ -81,5 +88,49 @@ export class PouroverInfraStack extends cdk.Stack {
 
     // grant lambda full operational access to table
     animeTable.grantFullAccess(animeScraper);
+
+    // lambda function to generate anime ids
+    const animeIdGenerator = new NodejsFunction(this, "animeIdGenerator", {
+      entry: "lambdas/anime-id-generator/index.ts",
+      handler: "handler",
+      memorySize: 1024,
+      timeout: Duration.seconds(30),
+      functionName: "anime-id-generator",
+    });
+
+    // lambda function to generate anime ids
+    const animeApiScraper = new NodejsFunction(this, "animeApiScraper", {
+      entry: "lambdas/anime-api-scraper/index.ts",
+      handler: "handler",
+      memorySize: 1024,
+      timeout: Duration.seconds(30),
+      functionName: "anime-api-scraper",
+    });
+
+    const mapState = new Map(this, "MapState", {
+      itemsPath: "$.Payload",
+    }).iterator(
+      new tasks.LambdaInvoke(this, "invoke api scraper", {
+        lambdaFunction: animeApiScraper,
+      }).next(
+        new tasks.LambdaInvoke(this, "invoke lambda scraper", {
+          lambdaFunction: animeScraper,
+        })
+      )
+    );
+
+    const generateIdsTask = new tasks.LambdaInvoke(this, "Generate anime ids", {
+      lambdaFunction: animeIdGenerator,
+    }).next(mapState);
+
+    const stepFunction = new StateMachine(
+      this,
+      `generate animes step function`,
+      {
+        definition: generateIdsTask,
+        stateMachineType: StateMachineType.STANDARD,
+        stateMachineName: `generate animes`,
+      }
+    );
   }
 }

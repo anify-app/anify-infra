@@ -115,6 +115,10 @@ class AnimeEntity extends Document implements Event {
 }
 
 export const handler = async (event: Event) => {
+  if (event.title) {
+    console.log("no title, skipping");
+    return;
+  }
   // extract attributes from event
   const { title, status, season, airedStart, mainImage } = event;
 

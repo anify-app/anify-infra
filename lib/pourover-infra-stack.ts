@@ -113,8 +113,9 @@ export class PouroverInfraStack extends cdk.Stack {
       new tasks.LambdaInvoke(this, "invoke-api-scraper", {
         lambdaFunction: animeApiScraper,
       }).next(
-        new tasks.LambdaInvoke(this, "invoke-lambda-scraper", {
+        new tasks.LambdaInvoke(this, "invoke-lambda scraper", {
           lambdaFunction: animeScraper,
+          inputPath: "$.Payload",
         })
       )
     );

@@ -1,5 +1,5 @@
 export const handler = async () => {
-  const arrayOf50kNums = Array.from(Array(50000)).map((_, idx) => idx + 1);
+  const arrayOf50kNums = Array.from(Array(1000)).map((_, idx) => idx + 1);
 
   const ids = arrayOf50kNums.map((entry, index) => {
     return {

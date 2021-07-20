@@ -1,11 +1,22 @@
-export const handler = async () => {
-  const arrayOf50kNums = Array.from(Array(1000)).map((_, idx) => idx + 1);
+type event = {
+  startIndex: number;
+  totalToProccess: number;
+};
 
-  const ids = arrayOf50kNums.map((entry, index) => {
+export const handler = async (event: event) => {
+  let arrayofNums;
+
+  if ((event.startIndex, event.totalToProccess))
+    arrayofNums = Array.from(Array(event.totalToProccess)).map(
+      (_, idx) => idx + event.startIndex + 1
+    );
+  else arrayofNums = Array.from(Array(1000)).map((_, idx) => idx + 1);
+
+  const ids = arrayofNums.map((entry, index) => {
     return {
       id: entry,
       index,
-      total: arrayOf50kNums.length,
+      total: arrayofNums.length,
     };
   });
 
@@ -16,3 +27,7 @@ export const handler = async () => {
 
   return ids;
 };
+
+handler({ startIndex: 100, totalToProccess: 20 }).then((res) =>
+  console.log(res)
+);

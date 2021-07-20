@@ -110,16 +110,16 @@ export class PouroverInfraStack extends cdk.Stack {
     const mapState = new Map(this, "MapState", {
       itemsPath: "$.Payload",
     }).iterator(
-      new tasks.LambdaInvoke(this, "invoke api scraper", {
+      new tasks.LambdaInvoke(this, "invoke-api-scraper", {
         lambdaFunction: animeApiScraper,
       }).next(
-        new tasks.LambdaInvoke(this, "invoke lambda scraper", {
+        new tasks.LambdaInvoke(this, "invoke-lambda-scraper", {
           lambdaFunction: animeScraper,
         })
       )
     );
 
-    const generateIdsTask = new tasks.LambdaInvoke(this, "Generate anime ids", {
+    const generateIdsTask = new tasks.LambdaInvoke(this, "Generate-anime-ids", {
       lambdaFunction: animeIdGenerator,
     }).next(mapState);
 
@@ -129,7 +129,7 @@ export class PouroverInfraStack extends cdk.Stack {
       {
         definition: generateIdsTask,
         stateMachineType: StateMachineType.STANDARD,
-        stateMachineName: `generate animes`,
+        stateMachineName: `generate-animes`,
       }
     );
   }

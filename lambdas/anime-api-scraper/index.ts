@@ -3,17 +3,17 @@ import cleanMalArrayFields from "./utils/cleanMalArrayFields";
 import determineStatus from "./utils/determineStatus";
 import determineType from "./utils/determineType";
 import determineRelation from "./utils/determineRelations";
-type event = number;
+type event = { id: number };
 export const handler = async (event: event) => {
   try {
     // give status update
     console.log(`🟡 [IN PROGRESS] - (${event})`);
 
-    const malAnime = await JikanTS.Anime.byId(event);
+    const malAnime = await JikanTS.Anime.byId(event.id);
 
     if (!malAnime) {
       console.log(
-        `🔵 [SKIPPED] - No anime found with ID ${event}, skipping item...`
+        `🔵 [SKIPPED] - No anime found with ID ${event.id}, skipping item...`
       );
       return { title: false };
     }

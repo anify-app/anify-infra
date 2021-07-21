@@ -12,10 +12,16 @@ export const handler = async (event: event) => {
     );
   else arrayofNums = Array.from(Array(1000)).map((_, idx) => idx + 1);
 
+  const ids = arrayofNums.map((entry, index) => {
+    return {
+      id: entry,
+    };
+  });
+
   console.log(
     "🟢 [SUCCESS] - Ids generated - Number of ids to scrap:",
-    arrayofNums.length
+    ids.length
   );
 
-  return arrayofNums;
+  return ids;
 };

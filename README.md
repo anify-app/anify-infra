@@ -1,14 +1,24 @@
-# Welcome to your CDK TypeScript project!
+# Anify Infrastructure
 
-This is a blank project for TypeScript development with CDK.
+Open Source Infrastructure designed to power [anify](https://github.com/anify-app/anify) 🔋.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## 📝 Architecture
 
-## Useful commands
+Application is responsible for storing an anime in a DynamoDB table with downstream writes to Algolia.
 
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+The anime-scraper Lambda is responsible for writing the anime to DynamoDb, and the anime-indexer Lambda is responsible for indexing to Algolia.
+
+## 🛫 CICD
+
+CDK Pipelines let us automatically build, test, and deploy a new version of our stack from github.
+
+Right now we are deploying to one Stage named "beta" with the base pipelines settings
+
+## Diagram
+
+![Architecture](./content/architecture.png)
+
+## 👨‍💻 Maintainers
+
+- [@m1yon](https://github.com/m1yon)
+- [@ifielder](https://github.com/ifielder)

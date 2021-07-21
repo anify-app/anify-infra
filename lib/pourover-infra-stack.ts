@@ -125,9 +125,14 @@ export class PouroverInfraStack extends cdk.Stack {
         inputPath: "$.Payload",
       })
     );
+
     const mapState = new Map(this, "MapState", {
       itemsPath: "$.Payload",
-    }).iterator(choice);
+    }).iterator(
+      new tasks.LambdaInvoke(this, "invoke-api-scraper", {
+        lambdaFunction: animeApiScraper,
+      }).next(choice)
+    );
 
     const generateIdsTask = new tasks.LambdaInvoke(this, "Generate-anime-ids", {
       lambdaFunction: animeIdGenerator,

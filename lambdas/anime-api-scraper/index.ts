@@ -3,7 +3,7 @@ import cleanMalArrayFields from "./utils/cleanMalArrayFields";
 import determineStatus from "./utils/determineStatus";
 import determineType from "./utils/determineType";
 import determineRelation from "./utils/determineRelations";
-type event = { id: number };
+type event = { id: number; index: number; total: number };
 export const handler = async (event: event) => {
   try {
     // give status update
@@ -13,7 +13,7 @@ export const handler = async (event: event) => {
 
     if (!malAnime) {
       console.log(
-        `🔵 [SKIPPED] - No anime found with ID ${event.id}, skipping item...`
+        `🔵 [SKIPPED] - No anime found with ID ${event?.id}, skipping item...`
       );
       return { title: false };
     }

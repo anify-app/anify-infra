@@ -2,38 +2,25 @@ import JikanTS from "jikants";
 import cleanMalArrayFields from "./utils/cleanMalArrayFields";
 import determineStatus from "./utils/determineStatus";
 import determineType from "./utils/determineType";
-import { reduce, camelCase } from "lodash";
-import slugify from "slugify";
-
-type event = { id: number; index: number; total: number };
+import determineRelation from "./utils/determineRelations";
+type event = number;
 export const handler = async (event: event) => {
   try {
     // give status update
     console.log(`🟡 [IN PROGRESS] - (${event})`);
 
-    const malAnime = await JikanTS.Anime.byId(event.id);
+    const malAnime = await JikanTS.Anime.byId(event);
 
     if (!malAnime) {
       console.log(
-        `🔵 [SKIPPED] - No anime found with ID ${event?.id}, skipping item...`
+        `🔵 [SKIPPED] - No anime found with ID ${event}, skipping item...`
       );
       return { title: false };
     }
 
     const anime = {
       title: malAnime?.title,
-      relations: reduce(
-        malAnime?.related,
-        (result, value, key) => {
-          const relationType = camelCase(key);
-          if (relationType === "adaptation") return {};
-          return (result = {
-            ...{ [relationType]: value.map(({ name }) => slugify(name)) },
-            ...result,
-          });
-        },
-        {}
-      ),
+      relations: determineRelation(malAnime.related),
       description: malAnime?.synopsis,
       trailer: malAnime?.trailer_url,
       type: determineType(malAnime?.type || ""),

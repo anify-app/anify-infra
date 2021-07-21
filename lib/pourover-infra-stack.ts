@@ -10,6 +10,9 @@ import {
   Map,
   StateMachine,
   StateMachineType,
+  Choice,
+  Succeed,
+  Condition,
 } from "@aws-cdk/aws-stepfunctions";
 import { Duration, SecretValue } from "@aws-cdk/core";
 import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
@@ -107,31 +110,33 @@ export class PouroverInfraStack extends cdk.Stack {
       functionName: "anime-api-scraper",
     });
 
+    // step function to process animes
+
+    const choice = new Choice(this, "Is Valid Anime?");
+
+    choice.when(
+      Condition.isBoolean("$.Payload.title"),
+      new Succeed(this, "No Id for anime")
+    );
+
+    choice.otherwise(
+      new tasks.LambdaInvoke(this, "invoke-lambda scraper", {
+        lambdaFunction: animeScraper,
+        inputPath: "$.Payload",
+      })
+    );
     const mapState = new Map(this, "MapState", {
       itemsPath: "$.Payload",
-    }).iterator(
-      new tasks.LambdaInvoke(this, "invoke-api-scraper", {
-        lambdaFunction: animeApiScraper,
-      }).next(
-        new tasks.LambdaInvoke(this, "invoke-lambda scraper", {
-          lambdaFunction: animeScraper,
-          inputPath: "$.Payload",
-        })
-      )
-    );
+    }).iterator(choice);
 
     const generateIdsTask = new tasks.LambdaInvoke(this, "Generate-anime-ids", {
       lambdaFunction: animeIdGenerator,
     }).next(mapState);
 
-    const stepFunction = new StateMachine(
-      this,
-      `generate animes step function`,
-      {
-        definition: generateIdsTask,
-        stateMachineType: StateMachineType.STANDARD,
-        stateMachineName: `generate-animes`,
-      }
-    );
+    new StateMachine(this, `generate animes step function`, {
+      definition: generateIdsTask,
+      stateMachineType: StateMachineType.STANDARD,
+      stateMachineName: `generate-animes`,
+    });
   }
 }

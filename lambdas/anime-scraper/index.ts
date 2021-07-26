@@ -3,6 +3,7 @@ import { Document } from "dynamoose/dist/Document";
 import { getPlaiceholder, IGetPlaiceholderReturn } from "plaiceholder";
 import slugify from "slugify";
 import * as cuid from "cuid";
+//@ts-expect-error no default export type for crypto
 import crypto from "crypto";
 
 type AnimeTableAttributes = { id: string; entity: string };

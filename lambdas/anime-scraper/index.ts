@@ -3,6 +3,7 @@ import { Document } from "dynamoose/dist/Document";
 import { getPlaiceholder, IGetPlaiceholderReturn } from "plaiceholder";
 import slugify from "slugify";
 import * as cuid from "cuid";
+import crypto from "crypto";
 
 type AnimeTableAttributes = { id: string; entity: string };
 const schema = new dynamoose.Schema(
@@ -121,7 +122,7 @@ export const handler = async (event: Event) => {
     return;
   }
   // extract attributes from event
-  const { title, mainImage } = event;
+  const { title, mainImage, airedStart } = event;
 
   // create domain model
   const AnimeEntity = dynamoose.model<AnimeEntity>("anime", schema, {
@@ -131,14 +132,22 @@ export const handler = async (event: Event) => {
   //generate slug
   const slug = slugify(title);
 
+  //create unique id based on airedStart and title
+  const id = crypto
+    .createHash("sha256", title)
+    .update(airedStart)
+    .digest("hex");
+
   let placiholder: IGetPlaiceholderReturn | undefined;
   if (mainImage) {
     placiholder = await getPlaiceholder(mainImage);
   }
+
   // create instance of the model
   const anime = new AnimeEntity({
-    PK: { id: cuid(), entity: "ANIME" },
+    PK: { id, entity: "ANIME" },
     SK: { id: "v1", entity: "VERSION" },
+    id,
     GSI1PK: { id: slug, entity: "TITLE" },
     slug,
     mainImageBlurred: placiholder?.base64,

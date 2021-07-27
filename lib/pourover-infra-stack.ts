@@ -66,7 +66,7 @@ export class PouroverInfraStack extends cdk.Stack {
       timeout: Duration.seconds(600),
       functionName: "anime-api-scraper",
       environment: {
-        ANIME_SCRAPER: animeScraper.functionArn,
+        ANIME_SCRAPER: animeScraper.functionName,
       },
     });
 

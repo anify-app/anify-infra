@@ -16,16 +16,17 @@ export const handler = async (event: event) => {
     console.error("scraper not configured");
     return;
   }
-  try {
-    const lambda = new Lambda();
-    const animeIds = Array.from(Array(event.endIndex)).map(
-      (_, idx) => idx + event.startIndex + 1
-    );
-    // give status update
-    console.log(`🟡 [IN PROGRESS] - (${event})`);
 
-    const animePromises = animeIds
-      .map(async (id) => {
+  const lambda = new Lambda({ region: "us-east-1" });
+  const animeIds = Array.from(Array(event.endIndex)).map(
+    (_, idx) => idx + event.startIndex + 1
+  );
+  // give status update
+  console.log(`🟡 [IN PROGRESS] - (${JSON.stringify(event, null, 2)})`);
+
+  const animePromises = animeIds
+    .map(async (id) => {
+      try {
         await delay(1000);
         const malAnime = await JikanTS.Anime.byId(id).catch(() => undefined);
 
@@ -71,22 +72,24 @@ export const handler = async (event: event) => {
         }
 
         return anime;
-      })
-      .filter(isPresent);
+      } catch {
+        return null;
+      }
+    })
+    .filter(isPresent);
 
-    const animes = await Promise.all(animePromises);
+  const animes = (await Promise.all(animePromises)).filter(isPresent);
 
-    const scraperPromises = animes.map(async (anime) => {
-      await lambda.invoke({
+  const scraperPromises = animes.map(async (anime) => {
+    await lambda
+      .invoke({
         FunctionName: process.env.ANIME_SCRAPER as string,
-        InvocationType: "Event",
-        Payload: new TextEncoder().encode(JSON.stringify(anime)),
-      });
-    });
+        InvocationType: "RequestResponse",
+        Payload: JSON.stringify(anime),
+      })
+      .promise();
+  });
 
-    const result = await Promise.all(scraperPromises);
-    return result;
-  } catch {
-    return { title: false };
-  }
+  const result = await Promise.all(scraperPromises);
+  return result;
 };

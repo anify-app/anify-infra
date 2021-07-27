@@ -135,7 +135,7 @@ export const handler = async (event: Event) => {
 
   //create unique id based on airedStart and title
   const id = crypto
-    .createHash("sha256", title)
+    .createHash("sha256", slug)
     .update(airedStart)
     .digest("hex");
 

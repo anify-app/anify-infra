@@ -25,14 +25,10 @@ export const handler = async (event: event) => {
   console.log(`🟡 [IN PROGRESS] - (${JSON.stringify(event, null, 2)})`);
 
   for (const id of animeIds) {
-    try {
-      await delay(1000);
-      const malAnime = await JikanTS.Anime.byId(id).catch(() => undefined);
+    await delay(1000);
+    const malAnime = await JikanTS.Anime.byId(id).catch(() => undefined);
 
-      if (!malAnime) {
-        return null;
-      }
-
+    if (malAnime) {
       const anime = {
         title: malAnime?.title,
         relations: determineRelation(malAnime.related),
@@ -75,8 +71,6 @@ export const handler = async (event: event) => {
           Payload: JSON.stringify(anime),
         })
         .promise();
-    } catch {
-      return null;
     }
   }
 };

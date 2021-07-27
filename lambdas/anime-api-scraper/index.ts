@@ -59,18 +59,24 @@ export const handler = async (event: event) => {
         score: malAnime?.score,
       };
 
-      if (anime.genres.includes("Hentai")) {
-        console.log(`🔵 [SKIPPED] - Hentai detected, skipping item...`);
-        return null;
+      console.log(`ID: ${id} | TITLE: ${anime.title}`);
+
+      const hasHentai = anime.genres.includes("Hentai");
+
+      if (hasHentai) {
+        console.log(
+          `🔵 [SKIPPED] - Hentai detected, skipping item | ID: ${id}...`
+        );
       }
 
-      await lambda
-        .invoke({
-          FunctionName: process.env.ANIME_SCRAPER as string,
-          InvocationType: "RequestResponse",
-          Payload: JSON.stringify(anime),
-        })
-        .promise();
+      if (!hasHentai)
+        await lambda
+          .invoke({
+            FunctionName: process.env.ANIME_SCRAPER as string,
+            InvocationType: "RequestResponse",
+            Payload: JSON.stringify(anime),
+          })
+          .promise();
     }
   }
 };

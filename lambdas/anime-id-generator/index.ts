@@ -1,22 +1,17 @@
 type event = {
-  startIndex: number;
   totalToProcess: number;
 };
 
 export const handler = async (event: event) => {
-  let arrayofNums;
+  const arrayOfNums = Array.from(
+    Array(event.totalToProcess / 1000)
+  ).map((_, idx) => [idx * 1000, idx * 1000 + 999]);
 
-  if ((event.startIndex, event.totalToProcess))
-    arrayofNums = Array.from(Array(event.totalToProcess)).map(
-      (_, idx) => idx + event.startIndex + 1
-    );
-  else arrayofNums = Array.from(Array(1000)).map((_, idx) => idx + 1);
-
-  const ids = arrayofNums.map((entry, index) => {
+  const ids = arrayOfNums.map((entry) => {
     return {
-      id: entry,
-      index,
-      total: arrayofNums.length,
+      startIndex: entry[0],
+      endIndex: entry[1],
+      total: event.totalToProcess,
     };
   });
 
@@ -27,3 +22,5 @@ export const handler = async (event: event) => {
 
   return ids;
 };
+
+handler({ totalToProcess: 2000 }).then((res) => console.log(res));

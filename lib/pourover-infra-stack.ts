@@ -27,8 +27,8 @@ export class PouroverInfraStack extends cdk.Stack {
     const animeScraper = new NodejsFunction(this, "AnimeScraper", {
       entry: "lambdas/anime-scraper/index.ts",
       handler: "handler",
-      memorySize: 1024,
-      timeout: Duration.seconds(30),
+      memorySize: 2048,
+      timeout: Duration.seconds(120),
       functionName: "anime-scraper",
       bundling: {
         nodeModules: ["sharp"],
@@ -97,7 +97,7 @@ export class PouroverInfraStack extends cdk.Stack {
       entry: "lambdas/anime-id-generator/index.ts",
       handler: "handler",
       memorySize: 1024,
-      timeout: Duration.seconds(30),
+      timeout: Duration.seconds(120),
       functionName: "anime-id-generator",
     });
 
@@ -105,33 +105,22 @@ export class PouroverInfraStack extends cdk.Stack {
     const animeApiScraper = new NodejsFunction(this, "animeApiScraper", {
       entry: "lambdas/anime-api-scraper/index.ts",
       handler: "handler",
-      memorySize: 1024,
-      timeout: Duration.seconds(30),
+      memorySize: 2048,
+      timeout: Duration.seconds(120),
       functionName: "anime-api-scraper",
+      environment: {
+        ANIME_SCRAPER: animeScraper.functionArn,
+      },
     });
 
     // step function to process animes
-
-    const choice = new Choice(this, "Is Valid Anime?");
-
-    choice.when(
-      Condition.isBoolean("$.Payload.title"),
-      new Succeed(this, "No Id for anime")
-    );
-
-    choice.otherwise(
-      new tasks.LambdaInvoke(this, "invoke-lambda scraper", {
-        lambdaFunction: animeScraper,
-        inputPath: "$.Payload",
-      })
-    );
 
     const mapState = new Map(this, "MapState", {
       itemsPath: "$.Payload",
     }).iterator(
       new tasks.LambdaInvoke(this, "invoke-api-scraper", {
         lambdaFunction: animeApiScraper,
-      }).next(choice)
+      })
     );
 
     const generateIdsTask = new tasks.LambdaInvoke(this, "Generate-anime-ids", {

@@ -33,6 +33,7 @@
     "@types/aws-lambda": "^8.10.77",
     "@types/lodash": "^4.14.171",
     "algoliasearch": "^4.10.0",
+    "aws-sdk": "^2.954.0",
     "cuid": "^2.1.8",
     "dotenv": "^10.0.0",
     "dynamoose": "^2.7.3",

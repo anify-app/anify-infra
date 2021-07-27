@@ -10,31 +10,16 @@ import {
   Map,
   StateMachine,
   StateMachineType,
-  Choice,
-  Succeed,
-  Condition,
 } from "@aws-cdk/aws-stepfunctions";
 import { Duration, SecretValue } from "@aws-cdk/core";
 import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
 import { StartingPosition } from "@aws-cdk/aws-lambda";
 import { DynamoEventSource } from "@aws-cdk/aws-lambda-event-sources";
+import { PolicyStatement } from "@aws-cdk/aws-iam";
 
 export class PouroverInfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-
-    // lambda function to scrape anime
-    const animeScraper = new NodejsFunction(this, "AnimeScraper", {
-      entry: "lambdas/anime-scraper/index.ts",
-      handler: "handler",
-      memorySize: 2048,
-      timeout: Duration.seconds(120),
-      functionName: "anime-scraper",
-      bundling: {
-        nodeModules: ["sharp"],
-        externalModules: ["sharp", "aws-sdk"],
-      },
-    });
 
     // dynamodb table Single Table Design
     const animeTable = new Table(this, "AnimeDB", {
@@ -60,6 +45,29 @@ export class PouroverInfraStack extends cdk.Stack {
       indexName: "GSI2",
       sortKey: { name: "GSI2SK", type: AttributeType.STRING },
       partitionKey: { name: "GSI2PK", type: AttributeType.STRING },
+    });
+    // lambda function to scrape anime
+    const animeScraper = new NodejsFunction(this, "AnimeScraper", {
+      entry: "lambdas/anime-scraper/index.ts",
+      handler: "handler",
+      memorySize: 2048,
+      timeout: Duration.seconds(120),
+      functionName: "anime-scraper",
+      bundling: {
+        nodeModules: ["sharp"],
+        externalModules: ["sharp", "aws-sdk"],
+      },
+    });
+    // lambda function to generate anime ids
+    const animeApiScraper = new NodejsFunction(this, "animeApiScraper", {
+      entry: "lambdas/anime-api-scraper/index.ts",
+      handler: "handler",
+      memorySize: 10240,
+      timeout: Duration.seconds(600),
+      functionName: "anime-api-scraper",
+      environment: {
+        ANIME_SCRAPER: animeScraper.functionArn,
+      },
     });
 
     // lambda function to index anime
@@ -101,17 +109,12 @@ export class PouroverInfraStack extends cdk.Stack {
       functionName: "anime-id-generator",
     });
 
-    // lambda function to generate anime ids
-    const animeApiScraper = new NodejsFunction(this, "animeApiScraper", {
-      entry: "lambdas/anime-api-scraper/index.ts",
-      handler: "handler",
-      memorySize: 10240,
-      timeout: Duration.seconds(600),
-      functionName: "anime-api-scraper",
-      environment: {
-        ANIME_SCRAPER: animeScraper.functionArn,
-      },
-    });
+    animeApiScraper.addToRolePolicy(
+      new PolicyStatement({
+        actions: ["lambda:InvokeFunction"],
+        resources: [animeScraper.functionArn],
+      })
+    );
 
     // step function to process animes
 

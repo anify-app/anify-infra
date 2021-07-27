@@ -5,6 +5,7 @@ import determineStatus from "./utils/determineStatus";
 import determineType from "./utils/determineType";
 import determineRelation from "./utils/determineRelations";
 import { TextEncoder } from "util";
+export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const isPresent = <T>(t: T | undefined | null | void): t is T => {
   return t !== undefined && t !== null;
@@ -25,7 +26,8 @@ export const handler = async (event: event) => {
 
     const animePromises = animeIds
       .map(async (id) => {
-        const malAnime = await JikanTS.Anime.byId(id);
+        await delay(1000);
+        const malAnime = await JikanTS.Anime.byId(id).catch(() => undefined);
 
         if (!malAnime) {
           return null;

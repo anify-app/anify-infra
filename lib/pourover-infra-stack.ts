@@ -105,8 +105,8 @@ export class PouroverInfraStack extends cdk.Stack {
     const animeApiScraper = new NodejsFunction(this, "animeApiScraper", {
       entry: "lambdas/anime-api-scraper/index.ts",
       handler: "handler",
-      memorySize: 2048,
-      timeout: Duration.seconds(120),
+      memorySize: 10240,
+      timeout: Duration.seconds(600),
       functionName: "anime-api-scraper",
       environment: {
         ANIME_SCRAPER: animeScraper.functionArn,

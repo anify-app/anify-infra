@@ -2,8 +2,7 @@ import * as dynamoose from "dynamoose";
 import { Document } from "dynamoose/dist/Document";
 import { getPlaiceholder, IGetPlaiceholderReturn } from "plaiceholder";
 import slugify from "slugify";
-import * as getColors from "get-image-colors";
-//@ts-expect-error no default export type for crypto
+import getColors from "get-image-colors";
 import crypto from "crypto";
 
 type AnimeTableAttributes = { id: string; entity: string };

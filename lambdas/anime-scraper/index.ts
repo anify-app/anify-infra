@@ -5,7 +5,6 @@ import slugify from "slugify";
 import * as getColors from "get-image-colors";
 //@ts-expect-error no default export type for crypto
 import crypto from "crypto";
-import { mainModule } from "process";
 
 type AnimeTableAttributes = { id: string; entity: string };
 const schema = new dynamoose.Schema(

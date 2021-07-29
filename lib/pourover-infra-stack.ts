@@ -54,7 +54,7 @@ export class PouroverInfraStack extends cdk.Stack {
       timeout: Duration.seconds(120),
       functionName: "anime-scraper",
       bundling: {
-        nodeModules: ["sharp"],
+        nodeModules: ["sharp", "get-image-colors"],
         externalModules: ["sharp", "aws-sdk"],
       },
     });

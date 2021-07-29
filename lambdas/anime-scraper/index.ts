@@ -2,9 +2,10 @@ import * as dynamoose from "dynamoose";
 import { Document } from "dynamoose/dist/Document";
 import { getPlaiceholder, IGetPlaiceholderReturn } from "plaiceholder";
 import slugify from "slugify";
-import * as cuid from "cuid";
+import * as getColors from "get-image-colors";
 //@ts-expect-error no default export type for crypto
 import crypto from "crypto";
+import { mainModule } from "process";
 
 type AnimeTableAttributes = { id: string; entity: string };
 const schema = new dynamoose.Schema(
@@ -140,8 +141,12 @@ export const handler = async (event: Event) => {
     .digest("hex");
 
   let placiholder: IGetPlaiceholderReturn | undefined;
+  let colors: Array<string> | undefined;
   if (mainImage) {
     placiholder = await getPlaiceholder(mainImage);
+    colors = await getColors(mainImage).then((colors) =>
+      colors.map((color) => color.hex())
+    );
   }
 
   // create instance of the model
@@ -151,6 +156,7 @@ export const handler = async (event: Event) => {
     id,
     GSI1PK: { id: slug, entity: "TITLE" },
     slug,
+    colors,
     mainImageBlurred: placiholder?.base64,
     ...event,
   });

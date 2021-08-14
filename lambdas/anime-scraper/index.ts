@@ -153,6 +153,7 @@ export const handler = async (event: Event) => {
     PK: { id, entity: "ANIME" },
     SK: { id: "v1", entity: "VERSION" },
     id,
+    shortId: id.substring(0, 5),
     GSI1PK: { id: slug, entity: "TITLE" },
     slug,
     colors,

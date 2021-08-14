@@ -4,6 +4,7 @@ import { getPlaiceholder, IGetPlaiceholderReturn } from "plaiceholder";
 import slugify from "slugify";
 import getColors from "get-image-colors";
 import crypto from "crypto";
+import { TransformOptions } from "stream";
 
 type AnimeTableAttributes = { id: string; entity: string };
 const schema = new dynamoose.Schema(
@@ -65,7 +66,7 @@ type Event = {
   mainImage: string | undefined;
   season: string | undefined;
   score: string | undefined;
-  airedStart: string | undefined;
+  airedStart: string;
   airedEnd: string | undefined;
   duration: string | undefined;
   sourceMaterialType: string;
@@ -101,7 +102,7 @@ class AnimeEntity extends Document implements Event {
   mainImage: string | undefined;
   description: string | undefined;
   season: string | undefined;
-  airedStart: string | undefined;
+  airedStart: string;
   airedEnd: string | undefined;
   duration: string | undefined;
   producers: Array<string>;
@@ -134,7 +135,7 @@ export const handler = async (event: Event) => {
 
   //create unique id based on airedStart and title
   const id = crypto
-    .createHash("sha256", slug)
+    .createHash("sha256", (slug as unknown) as TransformOptions)
     .update(airedStart)
     .digest("hex");
 

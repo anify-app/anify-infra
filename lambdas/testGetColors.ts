@@ -1,4 +1,4 @@
-import * as getColors from "get-image-colors";
+import getColors from "get-image-colors";
 
 export const testGetColors = async () => {
   const colors = await getColors(

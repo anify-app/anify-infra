@@ -26,27 +26,16 @@ const schema = new dynamoose.Schema(
       type: Object,
       index: {
         name: "GSI1",
-        rangeKey: "GSI1SK",
       },
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
     },
-    //@ts-expect-error we allow val to have AnimeTableAttributes
-    GSI1SK: {
-      type: Object,
-      set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-    },
+
     //@ts-expect-error we allow val to have AnimeTableAttributes
     GSI2PK: {
       type: Object,
       index: {
         name: "GSI2",
-        rangeKey: "GSI2SK",
       },
-      set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
-    },
-    //@ts-expect-error we allow val to have AnimeTableAttributes
-    GSI2SK: {
-      type: Object,
       set: (val: AnimeTableAttributes) => `${val.entity}#${val.id}`,
     },
   },
@@ -93,6 +82,9 @@ class AnimeEntity extends Document implements Event {
   slug: string;
   type: string;
   genres: Array<string>;
+  colors: Array<string>;
+  id: string;
+  shortId: string;
   status: string;
   blurredMainImage: string;
   score: string | undefined;
@@ -118,10 +110,6 @@ class AnimeEntity extends Document implements Event {
 }
 
 export const handler = async (event: Event) => {
-  if (!event.title) {
-    console.log("no title, skipping");
-    return;
-  }
   // extract attributes from event
   const { title, mainImage, airedStart } = event;
 
@@ -162,5 +150,7 @@ export const handler = async (event: Event) => {
   });
 
   // save model to dynamo
-  return await anime.save().catch((err) => console.error(err));
+  await anime.save().catch((err) => console.error(err));
+
+  return;
 };

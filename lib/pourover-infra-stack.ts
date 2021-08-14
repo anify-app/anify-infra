@@ -37,13 +37,12 @@ export class PouroverInfraStack extends cdk.Stack {
     });
     animeTable.addGlobalSecondaryIndex({
       indexName: "GSI1",
-      sortKey: { name: "GSI1SK", type: AttributeType.STRING },
+
       partitionKey: { name: "GSI1PK", type: AttributeType.STRING },
     });
 
     animeTable.addGlobalSecondaryIndex({
       indexName: "GSI2",
-      sortKey: { name: "GSI2SK", type: AttributeType.STRING },
       partitionKey: { name: "GSI2PK", type: AttributeType.STRING },
     });
     // lambda function to scrape anime
@@ -51,7 +50,7 @@ export class PouroverInfraStack extends cdk.Stack {
       entry: "lambdas/anime-scraper/index.ts",
       handler: "handler",
       memorySize: 2048,
-      timeout: Duration.seconds(120),
+      timeout: Duration.seconds(600),
       functionName: "anime-scraper",
       bundling: {
         nodeModules: ["sharp", "get-image-colors"],
@@ -75,7 +74,7 @@ export class PouroverInfraStack extends cdk.Stack {
       entry: "lambdas/anime-indexer/index.ts",
       handler: "handler",
       memorySize: 4096,
-      timeout: Duration.seconds(240),
+      timeout: Duration.seconds(600),
       functionName: "anime-indexer",
       environment: {
         APP_ID: SecretValue.secretsManager("gh", {

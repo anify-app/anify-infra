@@ -25,7 +25,6 @@ export const handler = async (event: event) => {
   console.log(`🟡 [IN PROGRESS] - (${JSON.stringify(event, null, 2)})`);
 
   for (const id of animeIds) {
-    await delay(1000);
     const malAnime = await JikanTS.Anime.byId(id).catch(() => undefined);
 
     if (malAnime) {
@@ -73,10 +72,11 @@ export const handler = async (event: event) => {
         await lambda
           .invoke({
             FunctionName: process.env.ANIME_SCRAPER as string,
-            InvocationType: "RequestResponse",
+            InvocationType: "Event",
             Payload: JSON.stringify(anime),
           })
           .promise();
     }
   }
+  return "done";
 };

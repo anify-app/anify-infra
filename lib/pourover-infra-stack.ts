@@ -50,7 +50,7 @@ export class PouroverInfraStack extends cdk.Stack {
       entry: "lambdas/anime-scraper/index.ts",
       handler: "handler",
       memorySize: 2048,
-      timeout: Duration.seconds(600),
+      timeout: Duration.seconds(180),
       functionName: "anime-scraper",
       bundling: {
         nodeModules: ["sharp", "get-image-colors"],
@@ -62,7 +62,7 @@ export class PouroverInfraStack extends cdk.Stack {
       entry: "lambdas/anime-api-scraper/index.ts",
       handler: "handler",
       memorySize: 10240,
-      timeout: Duration.seconds(600),
+      timeout: Duration.seconds(120),
       functionName: "anime-api-scraper",
       environment: {
         ANIME_SCRAPER: animeScraper.functionName,
@@ -74,7 +74,7 @@ export class PouroverInfraStack extends cdk.Stack {
       entry: "lambdas/anime-indexer/index.ts",
       handler: "handler",
       memorySize: 4096,
-      timeout: Duration.seconds(600),
+      timeout: Duration.seconds(120),
       functionName: "anime-indexer",
       environment: {
         APP_ID: SecretValue.secretsManager("gh", {

@@ -62,10 +62,14 @@ export class PouroverInfraStack extends cdk.Stack {
       entry: "lambdas/anime-api-scraper/index.ts",
       handler: "handler",
       memorySize: 10240,
-      timeout: Duration.seconds(120),
+      timeout: Duration.seconds(180),
       functionName: "anime-api-scraper",
       environment: {
         ANIME_SCRAPER: animeScraper.functionName,
+      },
+      bundling: {
+        nodeModules: ["sharp", "get-image-colors"],
+        externalModules: ["sharp", "aws-sdk"],
       },
     });
 
@@ -98,6 +102,9 @@ export class PouroverInfraStack extends cdk.Stack {
 
     // grant lambda full operational access to table
     animeTable.grantFullAccess(animeScraper);
+
+    // grant lambda full operational access to table
+    animeTable.grantFullAccess(animeApiScraper);
 
     // lambda function to generate anime ids
     const animeIdGenerator = new NodejsFunction(this, "animeIdGenerator", {

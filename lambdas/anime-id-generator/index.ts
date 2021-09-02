@@ -24,7 +24,11 @@ export const handler = async (event: event) => {
     ids.length
   );
 
+  console.log(Array.from(Array(5)).map((_, idx) => idx + 95 + 1));
+
   return ids;
 };
 
-handler({ totalToProcess: 1000 }).then((res) => console.log(res));
+handler({ totalToProcess: 20, processAtIndex: 20 }).then((res) =>
+  console.log(res)
+);

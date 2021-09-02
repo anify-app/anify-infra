@@ -4,7 +4,7 @@ import cleanMalArrayFields from "./utils/cleanMalArrayFields";
 import determineStatus from "./utils/determineStatus";
 import determineType from "./utils/determineType";
 import determineRelation from "./utils/determineRelations";
-import { TextEncoder } from "util";
+import { handler as scraper } from "../anime-scraper/index";
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const isPresent = <T>(t: T | undefined | null | void): t is T => {
@@ -18,7 +18,7 @@ export const handler = async (event: event) => {
   }
 
   const lambda = new Lambda({ region: "us-east-1" });
-  const animeIds = Array.from(Array(event.endIndex)).map(
+  const animeIds = Array.from(Array(5)).map(
     (_, idx) => idx + event.startIndex + 1
   );
   // give status update
@@ -40,9 +40,7 @@ export const handler = async (event: event) => {
         rating: malAnime?.rating,
         genres: cleanMalArrayFields(malAnime?.genres),
         season: malAnime?.premiered?.split(" ")[0],
-        airedStart: malAnime?.aired
-          ? new Date(malAnime?.aired?.from).toISOString()
-          : null,
+        airedStart: new Date(malAnime?.aired?.from).toISOString(),
         airedEnd: malAnime?.aired
           ? new Date(malAnime?.aired?.to).toISOString()
           : null,
@@ -50,6 +48,7 @@ export const handler = async (event: event) => {
         producers: cleanMalArrayFields(malAnime?.producers),
         licensors: cleanMalArrayFields(malAnime?.licensors),
         studios: cleanMalArrayFields(malAnime?.studios),
+        malId: malAnime.mal_id,
         sourceMaterialType: malAnime?.source,
         englishTitle: malAnime?.title_english,
         japaneseTitle: malAnime?.title_japanese,
@@ -68,14 +67,7 @@ export const handler = async (event: event) => {
         );
       }
 
-      if (!hasHentai)
-        await lambda
-          .invoke({
-            FunctionName: process.env.ANIME_SCRAPER as string,
-            InvocationType: "Event",
-            Payload: JSON.stringify(anime),
-          })
-          .promise();
+      if (!hasHentai) await scraper(anime);
     }
   }
   return "done";

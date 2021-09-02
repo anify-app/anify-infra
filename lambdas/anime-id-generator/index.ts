@@ -5,10 +5,10 @@ type event = {
 
 export const handler = async (event: event) => {
   const arrayOfNums = Array.from(
-    Array(event.totalToProcess / 5)
+    Array(event.totalToProcess / 50)
   ).map((_, idx) => [
-    idx * 5 + (event.processAtIndex || 0),
-    idx * 5 + 4 + (event.processAtIndex || 0),
+    idx * 50 + (event.processAtIndex || 0),
+    idx * 50 + 49 + (event.processAtIndex || 0),
   ]);
 
   const ids = arrayOfNums.map((entry) => {
@@ -29,6 +29,6 @@ export const handler = async (event: event) => {
   return ids;
 };
 
-handler({ totalToProcess: 20, processAtIndex: 20 }).then((res) =>
-  console.log(res)
-);
+// handler({ totalToProcess: 100, processAtIndex: 20 }).then((res) =>
+//   console.log(res)
+// );

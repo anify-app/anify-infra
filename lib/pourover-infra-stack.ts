@@ -125,6 +125,7 @@ export class PouroverInfraStack extends cdk.Stack {
     // step function to process animes
 
     const mapState = new Map(this, "MapState", {
+      maxConcurrency: 1,
       itemsPath: "$.Payload",
     }).iterator(
       new tasks.LambdaInvoke(this, "invoke-api-scraper", {

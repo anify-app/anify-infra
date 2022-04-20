@@ -30,7 +30,7 @@ export class Pipeline extends Stack {
               "arn:aws:codestar-connections:us-east-1:153676263714:connection/e84b06db-e4f7-4415-b916-943561c5b217", // Created using the AWS console * });',
           }
         ),
-        commands: ["npm ci", "npm run build", "npx cdk synth"],
+        commands: ["npm i npm -g", "npm ci", "npm run build", "npx cdk synth"],
       }),
     });
 

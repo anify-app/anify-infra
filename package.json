@@ -25,6 +25,7 @@
   "dependencies": {
     "@types/aws-lambda": "^8.10.77",
     "@types/lodash": "^4.14.171",
+    "@types/sharp": "^0.30.2",
     "algoliasearch": "^4.10.0",
     "aws-cdk-lib": "^2.20.0",
     "aws-sdk": "^2.954.0",

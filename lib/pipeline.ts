@@ -1,5 +1,5 @@
 import { Stack, StackProps, pipelines } from "aws-cdk-lib";
-import { App } from "aws-cdk-lib";
+import { App, aws_codebuild } from "aws-cdk-lib";
 
 import { PourOverInfraStage } from "./stage";
 
@@ -16,6 +16,7 @@ export class Pipeline extends Stack {
       codeBuildDefaults: {
         buildEnvironment: {
           privileged: true,
+          buildImage: aws_codebuild.LinuxBuildImage.AMAZON_LINUX_2_3,
         },
       },
       synth: new pipelines.ShellStep("Synth", {

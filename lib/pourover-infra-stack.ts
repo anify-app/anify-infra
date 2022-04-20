@@ -54,16 +54,6 @@ export class PouroverInfraStack extends Stack {
       },
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
     });
-    animeTable.addGlobalSecondaryIndex({
-      indexName: "GSI1",
-
-      partitionKey: { name: "GSI1PK", type: aws_dynamodb.AttributeType.STRING },
-    });
-
-    animeTable.addGlobalSecondaryIndex({
-      indexName: "GSI2",
-      partitionKey: { name: "GSI2PK", type: aws_dynamodb.AttributeType.STRING },
-    });
     // lambda function to scrape anime
     const animeScraper = new aws_lambda_nodejs.NodejsFunction(
       this,

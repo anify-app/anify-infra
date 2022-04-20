@@ -1,4 +1,13 @@
-import { aws_dynamodb, aws_lambda_nodejs, aws_lambda } from "aws-cdk-lib";
+import {
+  aws_dynamodb,
+  aws_lambda_nodejs,
+  aws_lambda,
+  Duration,
+  SecretValue,
+  App,
+  Stack,
+  StackProps,
+} from "aws-cdk-lib";
 import { LambdaInvoke } from "aws-cdk-lib/aws-stepfunctions-tasks";
 import {
   Map,
@@ -7,7 +16,6 @@ import {
 } from "aws-cdk-lib/aws-stepfunctions";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { SfnStateMachine } from "aws-cdk-lib/aws-events-targets";
-import { Duration, SecretValue, App, Stack, StackProps } from "aws-cdk-lib";
 import { DynamoEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 
@@ -174,7 +182,7 @@ export class PouroverInfraStack extends Stack {
     const stateMachineTarget = new SfnStateMachine(animeScraperStateMachine);
 
     new Rule(this, "AnimeScraperCron", {
-      schedule: Schedule.cron({ minute: "2" }),
+      schedule: Schedule.rate(Duration.minutes(1)),
       targets: [stateMachineTarget],
     });
   }

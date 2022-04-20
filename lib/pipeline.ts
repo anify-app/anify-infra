@@ -1,47 +1,36 @@
-import * as codepipeline from "@aws-cdk/aws-codepipeline";
-import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
-import { Construct, SecretValue, Stack, StackProps } from "@aws-cdk/core";
-import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
+import { Stack, StackProps, pipelines } from "aws-cdk-lib";
+import { App } from "aws-cdk-lib";
+
 import { PourOverInfraStage } from "./stage";
 
 /**
  * The stack that defines the application pipeline
  */
 export class Pipeline extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const sourceArtifact = new codepipeline.Artifact();
-    const cloudAssemblyArtifact = new codepipeline.Artifact();
-
-    const pipeline = new CdkPipeline(this, "PourOverLabsPipeline", {
+    const pipeline = new pipelines.CodePipeline(this, "PourOverLabsPipeline", {
       // The pipeline name
       pipelineName: "AnimeApp",
-      cloudAssemblyArtifact,
-
-      // Where the source can be found
-      sourceAction: new codepipeline_actions.GitHubSourceAction({
-        actionName: "GitHub",
-        output: sourceArtifact,
-        oauthToken: SecretValue.secretsManager("gh", {
-          jsonField: "github",
-        }),
-        branch: "main",
-        owner: "anify-app",
-        repo: "anify-infra",
-      }),
-
-      // How it will be built and synthesized
-      synthAction: SimpleSynthAction.standardNpmSynth({
-        environment: { privileged: true },
-        sourceArtifact,
-        cloudAssemblyArtifact,
+      synth: new pipelines.ShellStep("Synth", {
+        // Use a connection created using the AWS console to authenticate to GitHub
+        // Other sources are available.
+        input: pipelines.CodePipelineSource.connection(
+          "anify-app/anify-infra",
+          "main",
+          {
+            connectionArn:
+              "arn:aws:codestar-connections:us-east-1:153676263714:connection/e84b06db-e4f7-4415-b916-943561c5b217", // Created using the AWS console * });',
+          }
+        ),
+        commands: ["npm ci", "npm run build", "npx cdk synth"],
       }),
     });
 
     // add the application deployments
 
-    pipeline.addApplicationStage(
+    pipeline.addStage(
       new PourOverInfraStage(this, "beta", {
         env: { account: this.account, region: this.region },
       })

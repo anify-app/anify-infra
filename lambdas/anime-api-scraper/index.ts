@@ -17,7 +17,6 @@ export const handler = async (event: event) => {
     return;
   }
 
-  // const lambda = new Lambda({ region: "us-east-1" });
   const animeIds = Array.from(Array(event.endIndex - event.startIndex + 1)).map(
     (_, idx) => idx + event.startIndex + 1
   );

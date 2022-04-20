@@ -52,6 +52,14 @@ export const handler = async (event: event) => {
     create: false,
   });
   const processor = await Entity.get({ PK: "TASK#SCRAPER", SK: "VERSION#1" });
+  if (processor === null || processor === undefined) {
+    await Entity.create({
+      PK: "TASK#SCRAPER",
+      SK: "VERSION#1",
+      totalToProcess: 50,
+      processAtIndex: 0,
+    });
+  }
 
   const arrayOfNums = Array.from(
     Array(

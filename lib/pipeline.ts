@@ -13,6 +13,11 @@ export class Pipeline extends Stack {
     const pipeline = new pipelines.CodePipeline(this, "PourOverLabsPipeline", {
       // The pipeline name
       pipelineName: "AnimeApp",
+      codeBuildDefaults: {
+        buildEnvironment: {
+          privileged: true,
+        },
+      },
       synth: new pipelines.ShellStep("Synth", {
         // Use a connection created using the AWS console to authenticate to GitHub
         // Other sources are available.

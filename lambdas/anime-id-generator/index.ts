@@ -75,13 +75,13 @@ export const handler = async (event: event) => {
       (processor?.processAtIndex || event.processAtIndex || 0),
   ]);
 
-  const ids = arrayOfNums.map((entry) => {
-    return {
-      startIndex: entry[0],
-      endIndex: entry[1],
+  const ids = [
+    {
+      startIndex: processor?.processAtIndex || event.processAtIndex || 0,
+      endIndex: processor?.processAtIndex + processor?.totalToProcess,
       total: processor?.totalToProcess || event.totalToProcess,
-    };
-  });
+    },
+  ];
 
   console.log(
     "🟢 [SUCCESS] - Ids generated - Number of ids to scrap:",
@@ -92,7 +92,7 @@ export const handler = async (event: event) => {
     PK: "TASK#SCRAPER",
     SK: "VERSION#1",
     processAtIndex:
-      processor?.processAtIndex || 0 + processor?.totalToProcess || 50,
+      (processor?.processAtIndex || 0) + (processor?.totalToProcess || 50),
   });
 
   return ids;

@@ -182,7 +182,7 @@ export class PouroverInfraStack extends Stack {
     const stateMachineTarget = new SfnStateMachine(animeScraperStateMachine);
 
     new Rule(this, "AnimeScraperCron", {
-      schedule: Schedule.rate(Duration.minutes(3)),
+      schedule: Schedule.rate(Duration.minutes(5)),
       targets: [stateMachineTarget],
     });
   }
